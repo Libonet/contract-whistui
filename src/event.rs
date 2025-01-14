@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use color_eyre::Report;
 use crossterm::event::{Event as CrosstermEvent, KeyEvent, MouseEvent};
 use futures::{FutureExt, StreamExt};
 use tokio::sync::mpsc;
@@ -89,7 +90,7 @@ impl EventHandler {
         self.receiver
             .recv()
             .await
-            .ok_or(Box::new(std::io::Error::new(
+            .ok_or(Report::new(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 "This is an IO error",
             )))

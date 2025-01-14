@@ -1,5 +1,6 @@
 use std::io;
 
+use color_eyre::eyre::Context;
 use ratatui::{backend::CrosstermBackend, Terminal};
 
 use crate::{
@@ -17,6 +18,8 @@ pub mod ui;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
+    color_eyre::install()?;
+
     // Create an application.
     let mut app = App::new();
 
@@ -25,12 +28,12 @@ async fn main() -> AppResult<()> {
     let terminal = Terminal::new(backend)?;
     let events = EventHandler::new(250);
     let mut tui = Tui::new(terminal, events);
-    tui.init()?;
+    tui.init().wrap_err("failed setting up the terminal")?;
 
     // Start the main loop.
     while app.running {
         // Render the user interface.
-        tui.draw(&mut app)?;
+        tui.draw(&mut app).wrap_err("drawing failed!!!")?;
         // Handle events.
         match tui.events.next().await? {
             Event::Tick => app.tick(),
@@ -41,6 +44,6 @@ async fn main() -> AppResult<()> {
     }
 
     // Exit the user interface.
-    tui.exit()?;
+    tui.exit().wrap_err("failed restoring the terminal")?;
     Ok(())
 }

@@ -1,7 +1,7 @@
-use std::error;
+//use std::error;
 
 /// Application result type.
-pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
+pub type AppResult<T> = color_eyre::Result<T>;
 
 /// Application.
 #[derive(Debug)]
