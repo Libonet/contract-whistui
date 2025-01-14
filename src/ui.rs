@@ -8,22 +8,6 @@ use ratatui::{
 
 use crate::app::App;
 
-#[allow(dead_code)]
-fn render_placeholder(app: &mut App, frame: &mut Frame, game_area: Rect) {
-    let placeholder = Paragraph::new(format!(
-        "This is a tui template.\n\
-                Press `Esc`, `Ctrl-C` or `q` to stop running.\n\
-                Press left and right to increment and decrement the counter respectively.\n\
-                Counter: {}",
-        app.counter
-    ))
-    .style(Style::default().fg(Color::Cyan).bg(Color::Black))
-    .centered();
-
-    let game = placeholder;
-    frame.render_widget(game, game_area);
-}
-
 /// Renders the user interface widgets.
 pub fn render(app: &mut App, frame: &mut Frame) {
     // This is where you add new widgets.
@@ -45,8 +29,6 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     //let game_area = game_block.inner(chunks[0]);
     //frame.render_widget(game_block, chunks[0]);
 
-    //render_placeholder(app, frame, game_area);
-
     let game_area = chunks[0];
     render_game(app, frame, game_area);
 
@@ -60,7 +42,7 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 fn render_game(app: &mut App, frame: &mut Frame, game_area: Rect) {
     let game_layout = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([Constraint::Percentage(85), Constraint::Percentage(15)])
+        .constraints([Constraint::Percentage(80), Constraint::Percentage(20)])
         .split(game_area);
 
     let game_zone = game_layout[0];
@@ -93,32 +75,34 @@ fn render_game_zone(app: &mut App, frame: &mut Frame, game_zone: Rect) {
 }
 
 fn render_table(_app: &mut App, frame: &mut Frame, table_zone: Rect) {
+    use crate::cards::Card;
+
     let table_layout = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([Constraint::Ratio(1, 8), Constraint::Ratio(7, 8)])
         .split(table_zone);
 
-    let triumph = Paragraph::new("Here goes the triumph... if I had one".to_string())
+    let triumph_block = Block::bordered()
+        .title("Triumph")
+        .border_type(BorderType::Rounded)
+        .style(Style::default().fg(Color::Cyan).bg(Color::Black));
+
+    let inner_triumph = triumph_block.inner(table_layout[0]);
+    frame.render_widget(triumph_block, table_layout[0]);
+
+    let triumph = Card::default();
+    frame.render_widget(triumph, inner_triumph);
+
+    let played_cards = Paragraph::new("Here goes the played cards... if I had them".to_string())
         .centered()
-        .wrap(Wrap { trim: true })
         .block(
             Block::bordered()
-                .title("Triumph")
+                .title("Played Cards")
                 .border_type(BorderType::Rounded)
                 .style(Style::default().fg(Color::Cyan).bg(Color::Black)),
         );
-    frame.render_widget(triumph, table_layout[0]);
 
-    let ops_hands = Paragraph::new("Here goes the opponent's hands... if I had them".to_string())
-        .centered()
-        .block(
-            Block::bordered()
-                .title("Opponent Hands")
-                .border_type(BorderType::Rounded)
-                .style(Style::default().fg(Color::Cyan).bg(Color::Black)),
-        );
-
-    frame.render_widget(ops_hands, table_layout[1]);
+    frame.render_widget(played_cards, table_layout[1]);
 }
 
 fn render_chat_score(_app: &mut App, frame: &mut Frame, chat_score_zone: Rect) {

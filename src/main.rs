@@ -11,6 +11,7 @@ use crate::{
 };
 
 pub mod app;
+pub mod cards;
 pub mod event;
 pub mod handler;
 pub mod tui;
