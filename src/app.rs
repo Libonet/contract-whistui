@@ -5,10 +5,19 @@ pub type AppResult<T> = color_eyre::Result<T>;
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Screen {
+    MainMenu,
     SearchingForLobby,
     Lobby,
     Game,
     Exiting,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum State {
+    Playing,
+    Chatting,
+    Idle,
+    Menu,
 }
 
 /// Application.
@@ -16,8 +25,10 @@ pub enum Screen {
 pub struct App {
     /// Is the application running?
     pub running: bool,
-    /// screen the user is looking at
+    /// Screen the user is looking at
     pub current_screen: Screen,
+    /// What controls are available for the player
+    pub user_state: State,
 }
 
 impl Default for App {
@@ -25,6 +36,7 @@ impl Default for App {
         Self {
             running: true,
             current_screen: Screen::Game,
+            user_state: State::Idle,
         }
     }
 }
@@ -43,3 +55,4 @@ impl App {
         self.running = false;
     }
 }
+

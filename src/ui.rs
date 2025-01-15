@@ -6,7 +6,7 @@ use ratatui::{
     Frame,
 };
 
-use crate::app::App;
+use crate::app::{App, Screen};
 
 /// Renders the user interface widgets.
 pub fn render(app: &mut App, frame: &mut Frame) {
@@ -30,13 +30,26 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     //frame.render_widget(game_block, chunks[0]);
 
     let game_area = chunks[0];
-    render_game(app, frame, game_area);
+    match app.current_screen {
+        Screen::Game => {
+            render_game(app, frame, game_area);
 
-    let controls = Line::from("Controls: <- | -> | Enter | T for chat | q to quit")
-        .style(Style::default().fg(Color::Cyan).bg(Color::Black))
-        .centered();
+            let controls = Line::from("Controls: <- | -> | Enter | T for chat | q to quit")
+                .style(Style::default().fg(Color::Cyan).bg(Color::Black))
+                .centered();
 
-    frame.render_widget(controls, chunks[1]);
+            frame.render_widget(controls, chunks[1]);
+        }
+        Screen::Lobby => {
+        },
+        Screen::SearchingForLobby => {
+        },
+        Screen::MainMenu => {
+        },
+        Screen::Exiting => {
+
+        },
+    }
 }
 
 fn render_game(app: &mut App, frame: &mut Frame, game_area: Rect) {
