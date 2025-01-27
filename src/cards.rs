@@ -8,6 +8,7 @@ use ratatui::{
     widgets::{Block, Widget},
 };
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Suit {
     Clubs,
     Diamonds,
@@ -37,7 +38,7 @@ impl From<Suit> for String {
     }
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
 pub enum Value {
     Num(u8),
     J,
@@ -55,6 +56,7 @@ impl Display for Value {
     }
 }
 
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Card {
     value: Value,
     suit: Suit,
