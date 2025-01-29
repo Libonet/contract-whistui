@@ -107,7 +107,7 @@ impl Card {
 
 impl Default for Card {
     fn default() -> Self {
-        Self { value: Value::A, suit: Suit::Hearts, player: None, selected: false }
+        Self { value: Value::A, suit: Suit::Diamonds, player: None, selected: false }
     }
 }
 

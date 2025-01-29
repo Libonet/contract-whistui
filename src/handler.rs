@@ -1,4 +1,4 @@
-use crate::app::{App, AppResult, GameState, Screen};
+use crate::app::{App, AppResult, GameState, LobbyState, Screen};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 /// Handles the key events and updates the state of [`App`].
@@ -19,7 +19,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
 
     match &mut app.current_screen {
         Screen::Game(game_info) => {
-            match game_info.game.state {
+            match game_info.state {
                 GameState::Playing => {
                     match key_event.code {
                         // Exit application normal on `ESC` or `q`
@@ -41,7 +41,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
                         },
                         // Played a card
                         KeyCode::Enter => {
-                            game_info.game.state = GameState::Idle;
+                            game_info.state = GameState::Idle;
                         }
                         // Other handlers you could add here.
                         _ => {}
@@ -50,13 +50,16 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
                 GameState::Chatting => {
                     match key_event.code {
                         KeyCode::Esc => {
-                            game_info.change_state_to(game_info.game.last_state);
+                            game_info.toggle_state();
                         }
                         KeyCode::Char(ch) => {
                             game_info.chat.curr_input.push(ch);
                         }
                         KeyCode::Backspace => {
                             game_info.chat.curr_input.pop();
+                        }
+                        KeyCode::Enter => {
+                            todo!("Send message to all players and update own history");
                         }
                         _ => {}
                     }
@@ -96,7 +99,40 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
                 _ => {}
             }
         }
-        _ => (),
+        Screen::Lobby(lobby_info) => {
+            match lobby_info.state {
+                LobbyState::Readying => {
+                    match key_event.code {
+                        KeyCode::Char('s') | KeyCode::Char('S') => {
+                            if app.player == lobby_info.owner {
+                                todo!("Start game")
+                            }
+                        }
+                        KeyCode::Char('t') | KeyCode::Char('T') => {
+                            
+                        }
+                        _ => {}
+                    }
+                }
+                LobbyState::Chatting => {
+                    match key_event.code {
+                        KeyCode::Esc => {
+                            lobby_info.toggle_state();
+                        }
+                        KeyCode::Char(ch) => {
+                            lobby_info.chat.curr_input.push(ch);
+                        }
+                        KeyCode::Backspace => {
+                            lobby_info.chat.curr_input.pop();
+                        }
+                        KeyCode::Enter => {
+                            todo!("Send message to all players and update own history");
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
     }
 
     Ok(())

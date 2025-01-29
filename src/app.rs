@@ -20,6 +20,12 @@ pub enum GameState {
     Idle,
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum LobbyState {
+    Chatting,
+    Readying,
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Message {
     GameStart,
@@ -38,6 +44,7 @@ pub struct App {
     /// Screen the user is looking at
     pub current_screen: Screen,
     pub last_screen: Screen,
+    pub player: Player,
 }
 
 impl Default for App {
@@ -47,6 +54,7 @@ impl Default for App {
             is_exiting: false,
             current_screen: Screen::MainMenu,
             last_screen: Screen::MainMenu,
+            player: Player::default()
         }
     }
 }
@@ -66,11 +74,48 @@ impl App {
     }
 }
 
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct Player {
+    pub name: String,
+}
+
+impl Player {
+    pub fn new(name: String) -> Self {
+        Self { name, }
+    }
+}
+
 #[derive(Debug)]
 pub struct LobbyInfo {
     pub chat: Chat,
     pub player_list: Vec<String>,
     pub server: Server,
+    pub owner: Player,
+
+    pub state: LobbyState,
+    pub last_state: LobbyState,
+}
+
+impl LobbyInfo {
+    pub fn new(chat: Chat, player_list: Vec<String>, server: Server, owner: Player) -> Self {
+        Self {
+            chat,
+            player_list,
+            server,
+            owner,
+            state: LobbyState::Readying,
+            last_state: LobbyState::Readying,
+        }
+    }
+
+    pub fn change_state_to(&mut self, state: LobbyState) {
+        self.last_state = self.state;
+        self.state = state;
+    }
+
+    pub fn toggle_state(&mut self) {
+        std::mem::swap(&mut self.state, &mut self.last_state);
+    }
 }
 
 #[derive(Debug)]
@@ -78,6 +123,9 @@ pub struct GameInfo {
     pub game: Game,
     pub server: Server,
     pub chat: Chat,
+
+    pub state: GameState,
+    pub last_state: GameState,
 }
 
 impl GameInfo {
@@ -85,14 +133,19 @@ impl GameInfo {
         Self {
             game,
             server,
-            chat
+            chat,
+            state: GameState::Idle,
+            last_state: GameState::Idle,
         }
     }
 
     pub fn change_state_to(&mut self, state: GameState) {
-        let aux = self.game.state;
-        self.game.state = state;
-        self.game.last_state = aux;
+        self.last_state = self.state;
+        self.state = state;
+    }
+
+    pub fn toggle_state(&mut self) {
+        std::mem::swap(&mut self.state, &mut self.last_state);
     }
 }
 
@@ -101,9 +154,6 @@ pub struct Game {
     pub hand: Vec<Card>,
     pub table: Vec<Card>,
     pub triumph: Option<Card>,
-
-    pub state: GameState,
-    pub last_state: GameState,
 }
 
 #[derive(Debug)]
