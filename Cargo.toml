@@ -3,7 +3,7 @@ name = "contract-whistui"
 version = "0.1.0"
 authors = ["Santiago Libonati <santiago.libonati@gmail.com>"]
 license = "MIT"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 color-eyre = "0.6.3"
