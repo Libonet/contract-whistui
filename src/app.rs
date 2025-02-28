@@ -54,7 +54,7 @@ impl Default for App {
             is_exiting: false,
             current_screen: Screen::MainMenu,
             last_screen: Screen::MainMenu,
-            player: Player::default()
+            player: Player::default(),
         }
     }
 }
@@ -81,7 +81,7 @@ pub struct Player {
 
 impl Player {
     pub fn new(name: String) -> Self {
-        Self { name, }
+        Self { name }
     }
 }
 
@@ -180,4 +180,3 @@ pub struct Server {
     pub send: oneshot::Sender<Message>,
     pub recv: oneshot::Receiver<Message>,
 }
-

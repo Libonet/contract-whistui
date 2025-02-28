@@ -1,7 +1,7 @@
 use std::io;
 
 use color_eyre::eyre::Context;
-use ratatui::{backend::CrosstermBackend, Terminal};
+use ratatui::{Terminal, backend::CrosstermBackend};
 
 use crate::{
     app::{App, AppResult},

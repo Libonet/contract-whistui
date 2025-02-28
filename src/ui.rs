@@ -1,9 +1,9 @@
 use ratatui::{
+    Frame,
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style, Stylize},
     text::{Line, Text},
     widgets::{Block, BorderType, Borders, Clear, Paragraph, Wrap},
-    Frame,
 };
 
 use crate::app::{App, Game, GameInfo, Screen};
@@ -31,8 +31,7 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 
             frame.render_widget(controls, chunks[1]);
         }
-        Screen::Lobby(_) => {
-        },
+        Screen::Lobby(_) => {}
         Screen::MainMenu => {
             let chunks = Layout::default()
                 .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
@@ -50,30 +49,31 @@ pub fn render(app: &mut App, frame: &mut Frame) {
                 .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
                 .split(chunks[1]);
 
-            
             let create_area = centered_rect(50, 50, button_chunks[0]);
-            let create = Paragraph::new(Line::from("Create a lobby (c)").centered())
-                .block(Block::bordered()
+            let create = Paragraph::new(Line::from("Create a lobby (c)").centered()).block(
+                Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .style(Style::default().fg(Color::Cyan).bg(Color::Black)));
+                    .style(Style::default().fg(Color::Cyan).bg(Color::Black)),
+            );
 
             frame.render_widget(create, create_area);
 
             let join_area = centered_rect(50, 50, button_chunks[1]);
-            let join = Paragraph::new(Line::from("Join a lobby (j)").centered())
-                .block(Block::bordered()
+            let join = Paragraph::new(Line::from("Join a lobby (j)").centered()).block(
+                Block::bordered()
                     .border_type(BorderType::Rounded)
-                    .style(Style::default().fg(Color::Cyan).bg(Color::Black)));
+                    .style(Style::default().fg(Color::Cyan).bg(Color::Black)),
+            );
 
             frame.render_widget(join, join_area);
-        },
+        }
     }
 
     if app.is_exiting {
         //clear popup area
         let area = centered_rect(60, 25, frame.area());
         frame.render_widget(Clear, area);
-        
+
         let popup_block = Block::default()
             .title("Y/N")
             .borders(Borders::NONE)
