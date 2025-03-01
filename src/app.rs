@@ -13,6 +13,12 @@ pub enum Screen {
     Game(GameInfo),
 }
 
+#[derive(Debug)]
+pub enum Popup {
+    Exiting,
+    TextBox(String),
+}
+
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum GameState {
     Playing,
@@ -40,10 +46,9 @@ pub enum Message {
 pub struct App {
     /// Is the application running?
     pub running: bool,
-    pub is_exiting: bool,
+    pub popups: Option<Popup>,
     /// Screen the user is looking at
     pub current_screen: Screen,
-    pub last_screen: Screen,
     pub player: Player,
 }
 
@@ -51,9 +56,8 @@ impl Default for App {
     fn default() -> Self {
         Self {
             running: true,
-            is_exiting: false,
+            popups: None,
             current_screen: Screen::MainMenu,
-            last_screen: Screen::MainMenu,
             player: Player::default(),
         }
     }
@@ -88,7 +92,7 @@ impl Player {
 #[derive(Debug)]
 pub struct LobbyInfo {
     pub chat: Chat,
-    pub player_list: Vec<String>,
+    pub player_list: Vec<Player>,
     pub server: Server,
     pub owner: Player,
 
@@ -97,7 +101,7 @@ pub struct LobbyInfo {
 }
 
 impl LobbyInfo {
-    pub fn new(chat: Chat, player_list: Vec<String>, server: Server, owner: Player) -> Self {
+    pub fn new(chat: Chat, player_list: Vec<Player>, server: Server, owner: Player) -> Self {
         Self {
             chat,
             player_list,
@@ -180,3 +184,4 @@ pub struct Server {
     pub send: oneshot::Sender<Message>,
     pub recv: oneshot::Receiver<Message>,
 }
+

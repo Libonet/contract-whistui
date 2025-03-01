@@ -6,7 +6,7 @@ use ratatui::{
     widgets::{Block, BorderType, Borders, Clear, Paragraph, Wrap},
 };
 
-use crate::app::{App, Game, GameInfo, Screen};
+use crate::app::{App, Game, GameInfo, Popup, Screen};
 
 /// Renders the user interface widgets.
 pub fn render(app: &mut App, frame: &mut Frame) {
@@ -69,26 +69,31 @@ pub fn render(app: &mut App, frame: &mut Frame) {
         }
     }
 
-    if app.is_exiting {
-        //clear popup area
-        let area = centered_rect(60, 25, frame.area());
-        frame.render_widget(Clear, area);
+    if let Some(popup) = &app.popups {
+        match popup {
+            Popup::Exiting => {
+                //clear popup area
+                let area = centered_rect(60, 25, frame.area());
+                frame.render_widget(Clear, area);
 
-        let popup_block = Block::default()
-            .title("Y/N")
-            .borders(Borders::NONE)
-            .style(Style::default().fg(Color::Cyan).bg(Color::Black));
+                let popup_block = Block::default()
+                    .title("Y/N")
+                    .borders(Borders::NONE)
+                    .style(Style::default().fg(Color::Cyan).bg(Color::Black));
 
-        let exit_text = Text::styled(
-            "Would you like to exit? (y/n)",
-            Style::default().fg(Color::Red).bold(),
-        );
-        // the `trim: false` will stop the text from being cut off when over the edge of the block
-        let exit_paragraph = Paragraph::new(exit_text)
-            .block(popup_block)
-            .wrap(Wrap { trim: false });
+                let exit_text = Text::styled(
+                    "Would you like to exit? (y/n)",
+                    Style::default().fg(Color::Red).bold(),
+                );
+                // the `trim: false` will stop the text from being cut off when over the edge of the block
+                let exit_paragraph = Paragraph::new(exit_text)
+                    .block(popup_block)
+                    .wrap(Wrap { trim: false });
 
-        frame.render_widget(exit_paragraph, area);
+                frame.render_widget(exit_paragraph, area);
+            }
+            Popup::TextBox(_text) => {}
+        }
     }
 }
 

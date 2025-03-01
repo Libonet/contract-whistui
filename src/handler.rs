@@ -1,17 +1,20 @@
-use crate::app::{App, AppResult, GameState, LobbyState, Screen};
+use crate::app::{App, AppResult, GameState, LobbyState, Popup, Screen};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 /// Handles the key events and updates the state of [`App`].
 pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
-    if app.is_exiting {
-        match key_event.code {
-            KeyCode::Char('y') | KeyCode::Char('Y') => {
-                app.quit();
-            }
-            KeyCode::Char('n') | KeyCode::Char('N') => {
-                app.is_exiting = false;
-            }
-            _ => {}
+    if let Some(popup) = &mut app.popups {
+        match popup {
+            Popup::Exiting => match key_event.code {
+                KeyCode::Char('y') | KeyCode::Char('Y') => {
+                    app.quit();
+                }
+                KeyCode::Char('n') | KeyCode::Char('N') => {
+                    app.popups = None;
+                }
+                _ => {}
+            },
+            Popup::TextBox(_text) => {}
         }
 
         return Ok(());
@@ -23,8 +26,8 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
                 GameState::Playing => {
                     match key_event.code {
                         // Exit application normal on `ESC` or `q`
-                        KeyCode::Esc | KeyCode::Char('q') => {
-                            app.is_exiting = true;
+                        KeyCode::Esc | KeyCode::Char('q') | KeyCode::Char('Q') => {
+                            app.popups = Some(Popup::Exiting);
                         }
                         // Exit application on `Ctrl-C`
                         KeyCode::Char('c') | KeyCode::Char('C') => {
@@ -63,8 +66,8 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
                 GameState::Idle => {
                     match key_event.code {
                         // Exit application normal on `ESC` or `q`
-                        KeyCode::Esc | KeyCode::Char('q') => {
-                            app.is_exiting = true;
+                        KeyCode::Esc | KeyCode::Char('q') | KeyCode::Char('Q') => {
+                            app.popups = Some(Popup::Exiting);
                         }
                         // Exit application on `Ctrl-C`
                         KeyCode::Char('c') | KeyCode::Char('C') => {
@@ -83,7 +86,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         }
         Screen::MainMenu => match key_event.code {
             KeyCode::Esc | KeyCode::Char('q') | KeyCode::Char('Q') => {
-                app.is_exiting = true;
+                app.popups = Some(Popup::Exiting);
             }
             KeyCode::Char('c') | KeyCode::Char('C') => {
                 todo!("Create a lobby");
