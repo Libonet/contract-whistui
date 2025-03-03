@@ -2,6 +2,7 @@
 
 use crate::cards::Card;
 use tokio::sync::{broadcast, oneshot};
+use serde::{Serialize, Deserialize};
 
 /// Application result type.
 pub type AppResult<T> = color_eyre::Result<T>;
@@ -32,9 +33,10 @@ pub enum LobbyState {
     Readying,
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub enum Message {
     GameStart,
+    Rename(String),
     Play(Card),
     NewRound(Game),
     RequestPlay,
@@ -153,7 +155,7 @@ impl GameInfo {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct Game {
     pub hand: Vec<Card>,
     pub table: Vec<Card>,
@@ -164,24 +166,21 @@ pub struct Game {
 pub struct Chat {
     pub history: Vec<String>,
     pub curr_input: String,
-    pub receive: broadcast::Receiver<String>,
-    pub send: broadcast::Sender<String>,
+    pub stream: tokio::net::TcpStream,
 }
 
 impl Chat {
-    pub fn new(receive: broadcast::Receiver<String>, send: broadcast::Sender<String>) -> Self {
+    pub fn new(stream: tokio::net::TcpStream) -> Self {
         Self {
             history: Vec::new(),
             curr_input: String::new(),
-            receive,
-            send,
+            stream,
         }
     }
 }
 
 #[derive(Debug)]
 pub struct Server {
-    pub send: oneshot::Sender<Message>,
-    pub recv: oneshot::Receiver<Message>,
+    pub stream: tokio::net::TcpStream,
 }
 
