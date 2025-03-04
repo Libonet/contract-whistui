@@ -1,7 +1,7 @@
 use std::io;
 
 use color_eyre::eyre::Context;
-use ratatui::{backend::CrosstermBackend, Terminal};
+use ratatui::{Terminal, backend::CrosstermBackend};
 
 use crate::{
     app::{App, AppResult},
@@ -16,6 +16,7 @@ pub mod event;
 pub mod handler;
 pub mod tui;
 pub mod ui;
+pub mod server;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
