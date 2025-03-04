@@ -1,26 +1,32 @@
 use std::net::SocketAddr;
 
 use tokio::{
-    sync::{oneshot, broadcast, mpsc::{self, Sender}},
-    net::{TcpListener, TcpStream},
     io::{AsyncReadExt, AsyncWriteExt},
+    net::{TcpListener, TcpStream},
+    sync::{
+        broadcast,
+        mpsc::{self, Sender},
+        oneshot,
+    },
 };
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
-use crate::app::{
-    Player,
-    Message,
-};
+use crate::app::{Message, Player};
 
 struct Server {
     players: Vec<Player>,
-    owner: Player,
+    host_pos: usize,
 }
 
 impl Server {
-    pub fn new(owner: Player) -> Self {
-        Self { players: Vec::with_capacity(7), owner }
+    pub fn new(host: Player) -> Self {
+        let mut player_list = Vec::with_capacity(7);
+        player_list.push(host);
+        Self {
+            players: player_list,
+            host_pos: 0,
+        }
     }
 }
 
@@ -32,7 +38,7 @@ pub fn create_server(owner: Player) {
 
         let listener = TcpListener::bind("127.0.0.1:50000").await.unwrap();
         let (tx, mut rx) = mpsc::channel(16);
-        
+
         // Lobby
         loop {
             tokio::select! {
@@ -40,13 +46,12 @@ pub fn create_server(owner: Player) {
                     // hago algo con el socket
                     handle_user(socket, addr, tx.clone());
                 },
-                Some(msg) = rx.recv() => {
+                Some(data) = rx.recv() => {
+                    let (addr, msg) = data;
+
                     match msg {
-                        (addr, Message::GameStart) => { 
-                            if server.players.len() >= 3 {
-                                break;
-                            }
-                        },
+                        Message::GameStart => break,
+                        Message::Rename(str) => {},
                         _ => {},
                     }
                 },
@@ -55,7 +60,7 @@ pub fn create_server(owner: Player) {
 
         // Game
         loop {
-            break;
+            todo!("Implement game handling")
         }
     });
 }
@@ -67,13 +72,13 @@ fn handle_user(mut socket: TcpStream, addr: SocketAddr, tx: Sender<(SocketAddr, 
 
             match socket.read(&mut buffer).await {
                 Ok(n) if n > 0 => {
-                    match serde_json::from_slice(&buffer) {
-                        Ok(msg) => {
-                            tx.send((addr, msg));
-                        },
-                        _ => {},
+                    if let Ok(msg) = serde_json::from_slice(&buffer) {
+                        match tx.send((addr, msg)).await {
+                            Ok(()) => {}
+                            Err(_err) => todo!("Handle send errors"),
+                        }
                     }
-                },
+                }
                 Err(e) => eprintln!("Failed to read from socket: {}", e),
                 _ => {}
             }
@@ -82,5 +87,5 @@ fn handle_user(mut socket: TcpStream, addr: SocketAddr, tx: Sender<(SocketAddr, 
 }
 
 pub fn join_server() {
-    
+    todo!("Implement join_server")
 }

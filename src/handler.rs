@@ -1,4 +1,7 @@
-use crate::{app::{App, AppResult, GameState, LobbyState, Popup, Screen}, server};
+use crate::{
+    app::{App, AppResult, GameState, LobbyState, Popup, Screen},
+    server,
+};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 /// Handles the key events and updates the state of [`App`].
@@ -90,7 +93,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
             }
             KeyCode::Char('c') | KeyCode::Char('C') => {
                 // Create a lobby
-                server::create_server();
+                server::create_server(app.player.clone());
 
                 server::join_server();
             }
@@ -102,7 +105,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         Screen::Lobby(lobby_info) => match lobby_info.state {
             LobbyState::Readying => match key_event.code {
                 KeyCode::Char('s') | KeyCode::Char('S') => {
-                    if app.player == lobby_info.owner {
+                    if app.player == lobby_info.host {
                         todo!("Start game")
                     }
                 }

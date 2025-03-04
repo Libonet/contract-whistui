@@ -1,8 +1,7 @@
 //use std::error;
 
 use crate::cards::Card;
-use tokio::sync::{broadcast, oneshot};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Application result type.
 pub type AppResult<T> = color_eyre::Result<T>;
@@ -80,7 +79,7 @@ impl App {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct Player {
     pub name: String,
 }
@@ -96,19 +95,19 @@ pub struct LobbyInfo {
     pub chat: Chat,
     pub player_list: Vec<Player>,
     pub server: Server,
-    pub owner: Player,
+    pub host: Player,
 
     pub state: LobbyState,
     pub last_state: LobbyState,
 }
 
 impl LobbyInfo {
-    pub fn new(chat: Chat, player_list: Vec<Player>, server: Server, owner: Player) -> Self {
+    pub fn new(chat: Chat, player_list: Vec<Player>, server: Server, host: Player) -> Self {
         Self {
             chat,
             player_list,
             server,
-            owner,
+            host,
             state: LobbyState::Readying,
             last_state: LobbyState::Readying,
         }
@@ -183,4 +182,3 @@ impl Chat {
 pub struct Server {
     pub stream: tokio::net::TcpStream,
 }
-

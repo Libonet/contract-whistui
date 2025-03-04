@@ -14,9 +14,9 @@ pub mod app;
 pub mod cards;
 pub mod event;
 pub mod handler;
+pub mod server;
 pub mod tui;
 pub mod ui;
-pub mod server;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
