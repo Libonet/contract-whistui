@@ -93,7 +93,7 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
             }
             KeyCode::Char('c') | KeyCode::Char('C') => {
                 // Create a lobby
-                server::create_server(app.player.clone());
+                server::create_server();
 
                 server::join_server();
             }
