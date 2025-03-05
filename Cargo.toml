@@ -9,6 +9,7 @@ edition = "2024"
 color-eyre = "0.6.3"
 crossterm = { version = "0.28.1", features = ["event-stream"] }
 futures = "0.3.31"
+local-ip-address = "0.6.3"
 ratatui = "0.29.0"
 serde = { version = "1.0.218", features = ["derive"] }
 serde_json = "1.0.139"
