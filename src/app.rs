@@ -1,6 +1,6 @@
 //use std::error;
 
-use crate::cards::Card;
+use crate::{cards::Card, server::Id};
 use serde::{Deserialize, Serialize};
 
 /// Application result type.
@@ -36,10 +36,14 @@ pub enum LobbyState {
 pub enum Message {
     GameStart,
     Rename(String),
+
     Play(Card),
     NewRound(Game),
     RequestPlay,
     TimeOut(Card),
+
+    Ok,
+    Err(String),
 }
 
 /// Application.
@@ -85,7 +89,18 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(name: String) -> Self {
+    pub fn new(id: Id) -> Self {
+        // max 7 players
+        let name = match id {
+            0 => "Capybara",
+            1 => "Anaconda",
+            2 => "Axolotl",
+            3 => "Iguana",
+            4 => "Zebra",
+            5 => "Gorilla",
+            6 => "Tiger",
+            _ => "Error???",
+        }.to_string();
         Self { name }
     }
 }
